@@ -6,7 +6,11 @@
     <title>Atelier</title>
     <meta name="description" content="Génération d'images open source, sans compte et sans quota." />
     <meta name="theme-color" content="#14120f" />
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Atelier" />
+    <link rel="icon" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,8 +22,10 @@
       <header>
         <p class="eyebrow">Studio</p>
         <h1>Atelier</h1>
-        <p class="lede">Écris une idée. L’image se crée ici, sans compte et sans quota.</p>
+        <p class="lede">Application d’images. Installe-la, puis elle s’ouvre sans le navigateur.</p>
       </header>
+      <button class="go" id="install" type="button">Installer l’application</button>
+      <p class="note" id="install-help" hidden></p>
       <div class="layout">
         <section class="group">
           <label>Prompt<textarea id="prompt" maxlength="800">un renard roux dans une forêt enneigée, lumière dorée</textarea></label>
@@ -43,5 +49,6 @@
       </div>
     </main>
     <script src="app.js"></script>
+    <script src="install.js"></script>
   </body>
 </html>
