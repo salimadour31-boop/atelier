@@ -211,19 +211,24 @@
   // src/lib/horde.ts
   var FREE_MODELS = [
     { id: "sana", label: "Sana", engine: "pollinations" },
-    { id: "flux", label: "Flux", engine: "horde", model: "Flux.1-Schnell fp8 (Compact)", steps: 4, cfg: 1, sampler: "k_euler" },
-    { id: "real", label: "R\xE9aliste XL", engine: "horde", model: "Juggernaut XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
-    { id: "draw", label: "Illustration", engine: "horde", model: "DreamShaper XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
-    { id: "anime", label: "Anime", engine: "horde", model: "Nova Anime XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
+    { id: "photo", label: "Photo", engine: "horde", model: "ICBINP - I Can't Believe It's Not Photography", steps: 20, cfg: 7, sampler: "k_euler_a", max: 512 },
+    { id: "portrait", label: "Portrait", engine: "horde", model: "Realistic Vision", steps: 20, cfg: 7, sampler: "k_euler_a", max: 512 },
+    { id: "absolu", label: "Absolu", engine: "horde", model: "AbsoluteReality", steps: 20, cfg: 7, sampler: "k_euler_a", max: 512 },
+    { id: "deliberate", label: "D\xE9lib\xE9r\xE9", engine: "horde", model: "Deliberate", steps: 20, cfg: 7, sampler: "k_euler_a", max: 512 },
+    { id: "anime", label: "Anime", engine: "horde", model: "Nova Anime XL", steps: 20, cfg: 6, sampler: "k_euler_a", max: 1024 },
+    { id: "draw", label: "Illustration", engine: "horde", model: "DreamShaper XL", steps: 20, cfg: 6, sampler: "k_euler_a", max: 1024 },
+    { id: "base", label: "Base XL", engine: "horde", model: "AlbedoBase XL 3.1", steps: 20, cfg: 6, sampler: "k_euler_a", max: 1024 },
+    { id: "real", label: "R\xE9aliste XL", engine: "horde", model: "Juggernaut XL", steps: 20, cfg: 5, sampler: "k_euler_a", max: 1024 },
+    { id: "flux", label: "Flux", engine: "horde", model: "Flux.1-Schnell fp8 (Compact)", steps: 4, cfg: 1, sampler: "k_euler", max: 1024 },
     { id: "gemini", label: "Gemini", engine: "gemini" }
   ];
-  function hordeSize(width2, height2) {
-    const scale = Math.min(1, 1024 / Math.max(width2, height2));
+  function hordeSize(width2, height2, max = 1024) {
+    const scale = Math.min(1, max / Math.max(width2, height2));
     const snap = (value) => Math.max(64, Math.round(value * scale / 64) * 64);
     return [snap(width2), snap(height2)];
   }
   async function hordeImage(model, prompt2, negative2, width2, height2, onWait) {
-    const [safeWidth, safeHeight] = hordeSize(width2, height2);
+    const [safeWidth, safeHeight] = hordeSize(width2, height2, model.max);
     const response = await fetch("https://aihorde.net/api/v2/generate/async", {
       method: "POST",
       headers: {
