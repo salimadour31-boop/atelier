@@ -29,6 +29,7 @@
       <div class="layout">
         <section class="group">
           <label>Prompt<textarea id="prompt" maxlength="800">un renard roux dans une forêt enneigée, lumière dorée</textarea></label>
+          <div class="group"><span>Modèle</span><div class="chips" id="models"></div></div>
           <div class="group"><span>Style</span><div class="chips" id="styles"></div></div>
           <div class="group"><span>Effet</span><div class="chips" id="effects"></div></div>
           <div class="group"><span>Format</span><div class="chips" id="ratios"></div></div>
@@ -37,7 +38,7 @@
           <label>Clé Gemini<input id="gemini" type="password" autocomplete="off" placeholder="colle ta clé pour la qualité Gemini" /></label>
           <button class="go" id="go" type="button">Générer</button>
           <p class="err" id="error" hidden></p>
-          <p class="note">Sans clé, le moteur gratuit reste limité. Une clé gratuite se crée sur <a href="https://aistudio.google.com/apikey">AI Studio</a> et reste sur cet appareil.</p>
+          <p class="note">Sana est immédiat. Flux, Réaliste XL, Illustration et Anime sont gratuits, avec une file d’attente. Gemini demande une clé.</p>
         </section>
         <section class="group">
           <div class="frame" id="frame"><p class="note">L’image apparaîtra ici.</p></div>
