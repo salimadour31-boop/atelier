@@ -1,17 +1,17 @@
 {
-  "id": "./",
+  "id": "/atelier/",
   "name": "Atelier",
   "short_name": "Atelier",
   "description": "Génération d'images, sans compte et sans quota.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/atelier/",
+  "scope": "/atelier/",
   "display": "standalone",
   "background_color": "#14120f",
   "theme_color": "#14120f",
   "lang": "fr",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/atelier/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/atelier/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/atelier/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
