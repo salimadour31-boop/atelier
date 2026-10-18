@@ -4,53 +4,73 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Atelier</title>
-    <meta name="description" content="Génère des images à partir d'un texte, sans compte et sans abonnement." />
+    <meta name="description" content="Génération d'images, sans compte et sans quota." />
+    <meta name="theme-color" content="#14120f" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Atelier" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Outfit:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-      :root { color-scheme: dark; --bg: #14120f; --surface: #1e1b17; --fg: #f6f1e8; --muted: #a89f92; --line: #3a342c; --accent: #e08a45; --accent-fg: #1a120c; --bad: #c45c4a; }
+      :root { color-scheme: dark; --bg:#14120f; --surface:#1e1b17; --fg:#f6f1e8; --muted:#a89f92; --line:#3a342c; --accent:#e08a45; --accent-fg:#1a120c; --bad:#c45c4a; }
       * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg); font-family: Outfit, ui-sans-serif, system-ui, sans-serif; line-height: 1.5; }
-      main { width: min(64rem, calc(100% - 2rem)); margin: 0 auto; padding: 2rem 0 3rem; display: grid; gap: 1.5rem; }
-      h1 { font-family: Fraunces, Georgia, serif; font-weight: 500; font-size: clamp(2.5rem, 6vw, 3.5rem); letter-spacing: -0.03em; margin: 0; }
-      .eyebrow { color: var(--accent); font-size: 0.875rem; margin: 0; }
-      .lede { color: var(--muted); max-width: 36rem; margin: 0; }
-      .layout { display: grid; gap: 1.5rem; }
-      @media (min-width: 900px) { .layout { grid-template-columns: 1fr 1fr; align-items: start; } }
-      label, .group { display: flex; flex-direction: column; gap: 0.5rem; color: var(--muted); font-size: 0.875rem; }
-      textarea, input { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 0.75rem; padding: 0.75rem 1rem; font: inherit; font-size: 1rem; }
-      textarea { min-height: 8rem; resize: vertical; }
-      .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-      button, .link { min-height: 2.75rem; border-radius: 0.5rem; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0 1rem; font: inherit; font-size: 0.875rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
-      button[aria-pressed="true"], .go { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 500; }
-      button:disabled { opacity: 0.5; cursor: default; }
-      .go { width: 100%; }
-      .frame { min-height: 20rem; border: 1px solid var(--line); border-radius: 0.75rem; background: var(--surface); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-      img { width: 100%; max-height: 32rem; object-fit: contain; display: block; }
-      .note, .err { font-size: 0.875rem; }
-      .err { color: var(--bad); }
-      .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-      .thumbs button { padding: 0; overflow: hidden; }
-      .thumbs img { aspect-ratio: 1; object-fit: cover; max-height: none; }
+      body { margin:0; min-height:100vh; background:var(--bg); color:var(--fg); font-family:Outfit,ui-sans-serif,system-ui,sans-serif; line-height:1.5; }
+      main { width:min(64rem,calc(100% - 2rem)); margin:0 auto; padding:2rem 0 3rem; display:grid; gap:1.5rem; }
+      h1 { font-family:Fraunces,Georgia,serif; font-weight:500; font-size:clamp(2.5rem,6vw,3.5rem); letter-spacing:-.03em; margin:0; }
+      .eyebrow { color:var(--accent); font-size:.875rem; margin:0; }
+      .lede, .note { color:var(--muted); margin:0; }
+      .lede { max-width:36rem; }
+      .layout { display:grid; gap:1.5rem; }
+      @media (min-width:900px) { .layout { grid-template-columns:1fr 1fr; align-items:start; } }
+      label, .group { display:flex; flex-direction:column; gap:.5rem; color:var(--muted); font-size:.875rem; }
+      textarea, input { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--fg); border-radius:.75rem; padding:.75rem 1rem; font:inherit; font-size:1rem; }
+      textarea { min-height:8rem; resize:vertical; }
+      .chips { display:flex; flex-wrap:wrap; gap:.5rem; }
+      button, .link { min-height:2.75rem; border-radius:.5rem; border:1px solid var(--line); background:var(--surface); color:var(--fg); padding:0 1rem; font:inherit; font-size:.875rem; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+      button[aria-pressed="true"], .go, #install { background:var(--accent); color:var(--accent-fg); border-color:var(--accent); font-weight:500; }
+      button:disabled { opacity:.5; cursor:default; }
+      .go { width:100%; }
+      .frame { position:relative; min-height:20rem; border:1px solid var(--line); border-radius:.75rem; background:var(--surface); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+      img.result { width:100%; max-height:32rem; object-fit:contain; display:block; }
+      .err { color:var(--bad); font-size:.875rem; }
+      .thumbs { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; }
+      .thumbs button { padding:0; overflow:hidden; }
+      .thumbs img { aspect-ratio:1; object-fit:cover; width:100%; }
+      .veil { pointer-events:none; position:absolute; inset:0; }
+      .fx-grain { opacity:.45; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); }
+      .fx-gold { background:radial-gradient(circle at 28% 18%, rgba(224,138,69,.45), transparent 58%); mix-blend-mode:soft-light; }
+      .fx-mist { background:linear-gradient(180deg, rgba(246,241,232,.28), rgba(168,159,146,.18)); }
+      .fx-night { background:radial-gradient(circle, transparent 42%, rgba(8,10,16,.62)); }
+      .fx-bloom { background:radial-gradient(circle at 50% 42%, rgba(255,244,220,.34), transparent 62%); mix-blend-mode:screen; }
+      .gold { filter:sepia(.25) saturate(1.25); }
+      .grain { filter:contrast(1.1); }
+      .mist { filter:brightness(1.1) saturate(.75); }
+      .night { filter:brightness(.75) contrast(1.25) saturate(.9); }
+      .bloom { filter:brightness(1.1) saturate(1.1); }
     </style>
   </head>
   <body>
     <main>
       <header>
-        <p class="eyebrow">Studio public</p>
+        <p class="eyebrow">Studio</p>
         <h1>Atelier</h1>
-        <p class="lede">Écris une idée en français, en anglais ou en arabe. L’image se crée sans compte et sans abonnement xAI.</p>
+        <p class="lede">Écris une idée. L’image se crée ici, sans compte et sans quota.</p>
       </header>
       <div class="layout">
         <section class="group">
           <label>Prompt<textarea id="prompt" maxlength="800">un renard roux dans une forêt enneigée, lumière dorée</textarea></label>
           <div class="group"><span>Style</span><div class="chips" id="styles"></div></div>
+          <div class="group"><span>Effet</span><div class="chips" id="effects"></div></div>
           <div class="group"><span>Format</span><div class="chips" id="ratios"></div></div>
+          <div class="group"><span>Résolution</span><div class="chips" id="resolutions"></div></div>
           <label>À éviter<input id="negative" maxlength="200" placeholder="texte, flou, filigrane" /></label>
           <button class="go" id="go" type="button">Générer</button>
+          <button id="install" type="button" hidden>Installer l’application</button>
           <p class="err" id="error" hidden></p>
-          <p class="note">Service public gratuit. La définition monte jusqu’à 1280 px, pas en 4K. Pas de vidéo sur cette version.</p>
+          <p class="note" id="hint">Gratuit. Windows, Mac et Android : le bouton Installer, ou le menu du navigateur.</p>
         </section>
         <section class="group">
           <div class="frame" id="frame"><p class="note">L’image apparaîtra ici.</p></div>
@@ -60,10 +80,10 @@
       </div>
     </main>
     <script>
-      const styles = [["Réaliste", "photorealistic, natural light, sharp detail"],["Illustration", "illustration, clean shapes, rich color"],["3D", "3D render, studio lighting"],["Anime", "anime, clean lineart"],["Aquarelle", "watercolor, soft paper texture"]];
-      const ratios = {"1:1":[1024,1024],"16:9":[1280,720],"9:16":[720,1280],"4:3":[1024,768],"3:4":[768,1024]};
-      let style = styles[0][1];
-      let ratio = "1:1";
+      const styles = [["Réaliste","photorealistic, natural light, sharp detail",""],["Illustration","illustration, clean shapes, rich color",""],["3D","3D render, studio lighting",""],["Anime","anime, clean lineart",""],["Aquarelle","watercolor, soft paper texture",""]];
+      const effects = [["Aucun","","",""],["Or","golden hour light, warm highlights","gold","fx-gold"],["Grain","35mm film grain, subtle halation","grain","fx-grain"],["Brume","soft fog, muted colors, diffused light","mist","fx-mist"],["Nuit","night scene, cool moonlight, deep shadows","night","fx-night"],["Éclat","soft bloom, glowing highlights","bloom","fx-bloom"]];
+      const ratios = ["1:1","16:9","9:16","4:3","3:4"];
+      let style = styles[0][1], effect = effects[0], ratio = "16:9", resolution = "720p";
       const shots = [];
       function chips(host, items, current, onPick) {
         host.innerHTML = "";
@@ -77,20 +97,38 @@
         });
       }
       chips(document.querySelector("#styles"), styles.map(([label, value]) => ({ label, value })), () => style, (value) => { style = value; });
-      chips(document.querySelector("#ratios"), Object.keys(ratios).map((label) => ({ label, value: label })), () => ratio, (value) => { ratio = value; });
+      chips(document.querySelector("#effects"), effects.map((item) => ({ label: item[0], value: item })), () => effect, (value) => { effect = value; paint(); });
+      chips(document.querySelector("#ratios"), ratios.map((label) => ({ label, value: label })), () => ratio, (value) => { ratio = value; });
+      chips(document.querySelector("#resolutions"), ["720p","1080p"].map((label) => ({ label, value: label })), () => resolution, (value) => { resolution = value; });
       const frame = document.querySelector("#frame");
       const error = document.querySelector("#error");
       const download = document.querySelector("#download");
       const thumbs = document.querySelector("#thumbs");
       const go = document.querySelector("#go");
-      function show(url, prompt) {
+      function size() {
+        const shortSide = resolution === "1080p" ? 1080 : 720;
+        const [w, h] = ratio === "1:1" ? [1,1] : ratio === "16:9" ? [16,9] : ratio === "9:16" ? [9,16] : ratio === "4:3" ? [4,3] : [3,4];
+        return w >= h ? [Math.round(shortSide * w / h), shortSide] : [shortSide, Math.round(shortSide * h / w)];
+      }
+      function paint(url, prompt) {
         frame.replaceChildren();
-        const img = document.createElement("img");
-        img.alt = prompt;
-        img.src = url;
-        frame.appendChild(img);
-        download.hidden = false;
-        download.href = url;
+        if (url) {
+          const img = document.createElement("img");
+          img.className = "result " + effect[2];
+          img.alt = prompt || "";
+          img.src = url;
+          frame.appendChild(img);
+          download.hidden = false;
+          download.href = url;
+        } else {
+          frame.appendChild(Object.assign(document.createElement("p"), { className: "note", textContent: "L’image apparaîtra ici." }));
+          download.hidden = true;
+        }
+        if (effect[3]) {
+          const veil = document.createElement("div");
+          veil.className = "veil " + effect[3];
+          frame.appendChild(veil);
+        }
       }
       go.addEventListener("click", () => {
         const text = document.querySelector("#prompt").value.trim();
@@ -100,15 +138,15 @@
         go.textContent = "Génération…";
         frame.replaceChildren(Object.assign(document.createElement("p"), { className: "note", textContent: "Génération en cours…" }));
         const avoid = document.querySelector("#negative").value.trim();
-        const full = [text, style, avoid ? "without " + avoid : ""].filter(Boolean).join(", ");
-        const [width, height] = ratios[ratio];
+        const full = [text, style, effect[1], avoid ? "without " + avoid : ""].filter(Boolean).join(", ");
+        const [width, height] = size();
         const seed = Math.floor(Math.random() * 1e9);
         const url = "https://image.pollinations.ai/prompt/" + encodeURIComponent(full) + "?width=" + width + "&height=" + height + "&nologo=true&model=flux&seed=" + seed;
         const img = new Image();
         img.onload = () => {
           shots.unshift({ url, prompt: text });
           if (shots.length > 8) shots.pop();
-          show(url, text);
+          paint(url, text);
           thumbs.replaceChildren();
           shots.forEach((shot) => {
             const button = document.createElement("button");
@@ -117,7 +155,7 @@
             thumb.src = shot.url;
             thumb.alt = "";
             button.appendChild(thumb);
-            button.addEventListener("click", () => show(shot.url, shot.prompt));
+            button.addEventListener("click", () => paint(shot.url, shot.prompt));
             thumbs.appendChild(button);
           });
           go.disabled = false;
@@ -131,6 +169,21 @@
         };
         img.src = url;
       });
+      let deferred = null;
+      const install = document.querySelector("#install");
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferred = event;
+        install.hidden = false;
+      });
+      install.addEventListener("click", async () => {
+        if (!deferred) return;
+        deferred.prompt();
+        await deferred.userChoice;
+        deferred = null;
+        install.hidden = true;
+      });
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
     </script>
   </body>
 </html>
