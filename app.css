@@ -5,11 +5,12 @@ main { width:min(64rem,calc(100% - 2rem)); margin:0 auto; padding:2rem 0 3rem; d
 h1 { font-family:Fraunces,Georgia,serif; font-weight:500; font-size:clamp(2.5rem,6vw,3.5rem); letter-spacing:-.03em; margin:0; }
 .eyebrow { color:var(--accent); font-size:.875rem; margin:0; }
 .lede, .note { color:var(--muted); margin:0; }
+.note a { color:var(--accent); }
 .lede { max-width:36rem; }
 .layout { display:grid; gap:1.5rem; }
 @media (min-width:900px) { .layout { grid-template-columns:1fr 1fr; align-items:start; } }
 label, .group { display:flex; flex-direction:column; gap:.5rem; color:var(--muted); font-size:.875rem; }
-textarea, input[type="text"], #negative { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--fg); border-radius:.75rem; padding:.75rem 1rem; font:inherit; font-size:1rem; }
+textarea, input[type="text"], input[type="password"], #negative { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--fg); border-radius:.75rem; padding:.75rem 1rem; font:inherit; font-size:1rem; }
 textarea { min-height:8rem; resize:vertical; }
 .chips, #layers { display:flex; flex-wrap:wrap; gap:.5rem; }
 #layers { flex-direction:column; }
