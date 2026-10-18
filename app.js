@@ -168,6 +168,46 @@
     return { name: "\xC9clat", rgba, blend: "scrn", opacity: 170 };
   }
 
+  // src/lib/gemini.ts
+  var KEY = "atelier-gemini-key";
+  function readGeminiKey() {
+    if (typeof localStorage === "undefined") return "";
+    return localStorage.getItem(KEY) ?? "";
+  }
+  function saveGeminiKey(value) {
+    localStorage.setItem(KEY, value.trim());
+  }
+  function geminiDataUrl(payload) {
+    const parts = payload?.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) {
+      const record = part;
+      const inline = record.inlineData ?? record.inline_data;
+      if (!inline?.data) continue;
+      const mime = record.inlineData?.mimeType ?? record.inline_data?.mime_type ?? "image/png";
+      return `data:${mime};base64,${inline.data}`;
+    }
+    return null;
+  }
+  async function geminiImage(key, prompt2, ratio2) {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": key },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt2 }] }],
+        generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: ratio2 } }
+      })
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      if (response.status === 429) throw new Error("Quota Gemini atteint. R\xE9essaie plus tard.");
+      if (response.status === 400 || response.status === 403) throw new Error("Cl\xE9 Gemini refus\xE9e. V\xE9rifie-la sur AI Studio.");
+      throw new Error("Gemini n\u2019a pas r\xE9pondu.");
+    }
+    const url = geminiDataUrl(payload);
+    if (!url) throw new Error("Gemini n\u2019a pas renvoy\xE9 d\u2019image.");
+    return url;
+  }
+
   // src/lib/segment.ts
   var NAMES = [
     [345, 20, "Rouge"],
@@ -354,6 +394,7 @@
   var buffers = /* @__PURE__ */ new Map();
   var prompt = document.querySelector("#prompt");
   var negative = document.querySelector("#negative");
+  var gemini = document.querySelector("#gemini");
   var frame = document.querySelector("#frame");
   var layers = document.querySelector("#layers");
   var moves = document.querySelector("#moves");
@@ -399,7 +440,10 @@
     error.hidden = false;
     error.textContent = message;
   }
-  go.addEventListener("click", () => {
+  gemini.value = readGeminiKey();
+  gemini.addEventListener("change", () => saveGeminiKey(gemini.value));
+  go.addEventListener("click", () => void generate());
+  async function generate() {
     const text2 = prompt.value.trim();
     if (text2.length < 2) return;
     error.hidden = true;
@@ -412,21 +456,27 @@
     const avoid = negative.value.trim();
     const full = [text2, style, effect[1], "sharp focus, fine detail, natural texture", avoid ? `without ${avoid}` : "without blur, pixelation, watermark"].filter(Boolean).join(", ");
     const seed = Math.floor(Math.random() * 1e9);
-    imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=flux&enhance=true&seed=${seed}`;
-    const img = new Image();
-    img.onload = () => {
-      go.disabled = false;
-      go.textContent = "G\xE9n\xE9rer";
+    const key = gemini.value.trim();
+    saveGeminiKey(key);
+    try {
+      imageUrl = key ? await geminiImage(key, full, ratio) : await loadImage(`https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=flux&enhance=true&seed=${seed}`);
       split.hidden = false;
       showImage();
-    };
-    img.onerror = () => {
+    } catch (err) {
+      fail(err instanceof Error ? err.message : "L\u2019image n\u2019a pas pu \xEAtre cr\xE9\xE9e. R\xE9essaie.");
+    } finally {
       go.disabled = false;
       go.textContent = "G\xE9n\xE9rer";
-      fail("L\u2019image n\u2019a pas pu \xEAtre cr\xE9\xE9e. R\xE9essaie.");
-    };
-    img.src = imageUrl;
-  });
+    }
+  }
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(url);
+      img.onerror = () => reject(new Error("L\u2019image n\u2019a pas pu \xEAtre cr\xE9\xE9e. R\xE9essaie."));
+      img.src = url;
+    });
+  }
   split.addEventListener("click", () => void separate());
   psd.addEventListener("click", () => void savePsd());
   async function separate() {
