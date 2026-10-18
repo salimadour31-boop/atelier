@@ -1,28 +1,23 @@
 # Atelier
 
-Génération d'images. Aucun compte, aucune clé, aucun quota xAI.
+Générateur d'images open source. Aucun compte, aucune clé API, aucun quota.
 
-Le site est une page web installable sur Windows, macOS et Android.
+MIT. Tout le monde peut utiliser, copier et modifier ce projet.
 
-Adresse : https://salimadour31-boop.github.io/atelier/
-
-## Mettre le site en ligne
-
-Si le lien ci-dessus répond encore 404 :
+## Utiliser
 
 1. Ouvre https://github.com/salimadour31-boop/atelier/settings/pages
 2. Source : Deploy from a branch
-3. Branche `main`, dossier `/` (root)
-4. Save
+3. Branche `main`, dossier `/` (root), puis Save
 
-Attends une minute, puis ouvre le lien.
+Le site public est ensuite https://salimadour31-boop.github.io/atelier/
 
-## Installer
+- **Générer** crée l'image.
+- **Séparer les calques** découpe les zones.
+- **Exporter le PSD** ouvre les calques dans Photoshop.
 
-Ouvre le lien dans le navigateur, puis :
+## Lancer en local
 
-- Windows : Chrome ou Edge, menu, Installer Atelier. L'application apparaît dans le menu Démarrer.
-- macOS : Chrome, menu, Installer Atelier. Avec Safari : Partager, puis Ajouter au Dock.
-- Android : Chrome, menu, Installer l'application ou Ajouter à l'écran d'accueil.
+Ouvre `index.html` dans Chrome, Edge ou Firefox. Aucune installation.
 
-Aucun logiciel à télécharger. La vidéo n'est pas incluse : une vidéo illimitée et gratuite n'existe pas sans faire payer quelqu'un.
+Les images viennent du service public [Pollinations](https://pollinations.ai), sans clé.
