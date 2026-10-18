@@ -179,7 +179,7 @@
     [320, 345, "Rose"]
   ];
   function splitElements(rgba, width2, height2) {
-    const maxSide = 420;
+    const maxSide = 768;
     const sw = Math.max(1, Math.round(width2 * Math.min(1, maxSide / width2)));
     const sh = Math.max(1, Math.round(height2 * Math.min(1, maxSide / height2)));
     const small = new Uint8ClampedArray(sw * sh * 3);
@@ -345,7 +345,7 @@
   var style = styles[0][1];
   var effect = effects[0];
   var ratio = "16:9";
-  var resolution = "720p";
+  var resolution = "1080p";
   var imageUrl = "";
   var pieces = [];
   var width = 0;
@@ -410,9 +410,9 @@
     renderLayers();
     const [w, h] = frameSize();
     const avoid = negative.value.trim();
-    const full = [text2, style, effect[1], avoid ? `without ${avoid}` : ""].filter(Boolean).join(", ");
+    const full = [text2, style, effect[1], "sharp focus, fine detail, natural texture", avoid ? `without ${avoid}` : "without blur, pixelation, watermark"].filter(Boolean).join(", ");
     const seed = Math.floor(Math.random() * 1e9);
-    imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=flux&seed=${seed}`;
+    imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=flux&enhance=true&seed=${seed}`;
     const img = new Image();
     img.onload = () => {
       go.disabled = false;
