@@ -208,6 +208,62 @@
     return url;
   }
 
+  // src/lib/horde.ts
+  var FREE_MODELS = [
+    { id: "sana", label: "Sana", engine: "pollinations" },
+    { id: "flux", label: "Flux", engine: "horde", model: "Flux.1-Schnell fp8 (Compact)", steps: 4, cfg: 1, sampler: "k_euler" },
+    { id: "real", label: "R\xE9aliste XL", engine: "horde", model: "Juggernaut XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
+    { id: "draw", label: "Illustration", engine: "horde", model: "DreamShaper XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
+    { id: "anime", label: "Anime", engine: "horde", model: "Nova Anime XL", steps: 8, cfg: 4, sampler: "k_euler_a" },
+    { id: "gemini", label: "Gemini", engine: "gemini" }
+  ];
+  function hordeSize(width2, height2) {
+    const scale = Math.min(1, 1024 / Math.max(width2, height2));
+    const snap = (value) => Math.max(64, Math.round(value * scale / 64) * 64);
+    return [snap(width2), snap(height2)];
+  }
+  async function hordeImage(model, prompt2, negative2, width2, height2, onWait) {
+    const [safeWidth, safeHeight] = hordeSize(width2, height2);
+    const response = await fetch("https://aihorde.net/api/v2/generate/async", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        apikey: "0000000000",
+        "Client-Agent": "Atelier:1.0:github.com/salimadour31-boop/atelier"
+      },
+      body: JSON.stringify({
+        prompt: negative2 ? `${prompt2} ### ${negative2}` : prompt2,
+        params: {
+          width: safeWidth,
+          height: safeHeight,
+          steps: model.steps,
+          cfg_scale: model.cfg,
+          sampler_name: model.sampler,
+          n: 1
+        },
+        nsfw: false,
+        censor_nsfw: true,
+        r2: true,
+        models: [model.model]
+      })
+    });
+    const created = await response.json().catch(() => null);
+    if (!response.ok || !created?.id) throw new Error("Ce mod\xE8le gratuit n\u2019est pas disponible. Essaie-en un autre.");
+    const deadline = Date.now() + 18e4;
+    while (Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 3e3));
+      const check = await fetch(`https://aihorde.net/api/v2/generate/check/${created.id}`).then((item) => item.json());
+      if (check.faulted) throw new Error("Le mod\xE8le gratuit a \xE9chou\xE9. Essaie-en un autre.");
+      if (check.done) break;
+      const wait = Number(check.wait_time) || 0;
+      onWait?.(wait > 0 ? `File d\u2019attente, environ ${wait} s` : "File d\u2019attente\u2026");
+    }
+    const status = await fetch(`https://aihorde.net/api/v2/generate/status/${created.id}`).then((item) => item.json());
+    const url = status?.generations?.[0]?.img;
+    if (!url) throw new Error("Le mod\xE8le gratuit n\u2019a pas r\xE9pondu \xE0 temps. R\xE9essaie.");
+    return url;
+  }
+
   // src/lib/segment.ts
   var NAMES = [
     [345, 20, "Rouge"],
@@ -385,6 +441,7 @@
   var style = styles[0][1];
   var effect = effects[0];
   var ratio = "16:9";
+  var modelId = "sana";
   var resolution = "1080p";
   var imageUrl = "";
   var pieces = [];
@@ -420,6 +477,9 @@
   }
   chips("#styles", styles.map(([label, value]) => ({ label, value })), () => style, (value) => {
     style = value;
+  });
+  chips("#models", FREE_MODELS.map((item) => ({ label: item.label, value: item.id })), () => modelId, (value) => {
+    modelId = value;
   });
   chips("#effects", effects.map((item) => ({ label: item[0], value: item[2] })), () => effect[2], (value) => {
     effect = effects.find((item) => item[2] === value) ?? effects[0];
@@ -458,8 +518,18 @@
     const seed = Math.floor(Math.random() * 1e9);
     const key = gemini.value.trim();
     saveGeminiKey(key);
+    const selected2 = FREE_MODELS.find((item) => item.id === modelId) ?? FREE_MODELS[0];
     try {
-      imageUrl = key ? await geminiImage(key, full, ratio) : await loadImage(`https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=flux&enhance=true&seed=${seed}`);
+      if (selected2.engine === "gemini") {
+        if (!key) throw new Error("Colle une cl\xE9 Gemini pour ce mod\xE8le.");
+        imageUrl = await geminiImage(key, full, ratio);
+      } else if (selected2.engine === "horde") {
+        imageUrl = await hordeImage(selected2, full, avoid, w, h, (message) => {
+          go.textContent = message;
+        });
+      } else {
+        imageUrl = await loadImage(`https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${w}&height=${h}&nologo=true&model=sana&enhance=true&seed=${seed}`);
+      }
       split.hidden = false;
       showImage();
     } catch (err) {
