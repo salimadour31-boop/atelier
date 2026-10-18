@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atelier</title>
+    <meta name="description" content="Génère des images à partir d'un texte, sans compte et sans abonnement." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Outfit:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: dark; --bg: #14120f; --surface: #1e1b17; --fg: #f6f1e8; --muted: #a89f92; --line: #3a342c; --accent: #e08a45; --accent-fg: #1a120c; --bad: #c45c4a; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg); font-family: Outfit, ui-sans-serif, system-ui, sans-serif; line-height: 1.5; }
+      main { width: min(64rem, calc(100% - 2rem)); margin: 0 auto; padding: 2rem 0 3rem; display: grid; gap: 1.5rem; }
+      h1 { font-family: Fraunces, Georgia, serif; font-weight: 500; font-size: clamp(2.5rem, 6vw, 3.5rem); letter-spacing: -0.03em; margin: 0; }
+      .eyebrow { color: var(--accent); font-size: 0.875rem; margin: 0; }
+      .lede { color: var(--muted); max-width: 36rem; margin: 0; }
+      .layout { display: grid; gap: 1.5rem; }
+      @media (min-width: 900px) { .layout { grid-template-columns: 1fr 1fr; align-items: start; } }
+      label, .group { display: flex; flex-direction: column; gap: 0.5rem; color: var(--muted); font-size: 0.875rem; }
+      textarea, input { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 0.75rem; padding: 0.75rem 1rem; font: inherit; font-size: 1rem; }
+      textarea { min-height: 8rem; resize: vertical; }
+      .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      button, .link { min-height: 2.75rem; border-radius: 0.5rem; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 0 1rem; font: inherit; font-size: 0.875rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+      button[aria-pressed="true"], .go { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 500; }
+      button:disabled { opacity: 0.5; cursor: default; }
+      .go { width: 100%; }
+      .frame { min-height: 20rem; border: 1px solid var(--line); border-radius: 0.75rem; background: var(--surface); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      img { width: 100%; max-height: 32rem; object-fit: contain; display: block; }
+      .note, .err { font-size: 0.875rem; }
+      .err { color: var(--bad); }
+      .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+      .thumbs button { padding: 0; overflow: hidden; }
+      .thumbs img { aspect-ratio: 1; object-fit: cover; max-height: none; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Studio public</p>
+        <h1>Atelier</h1>
+        <p class="lede">Écris une idée en français, en anglais ou en arabe. L’image se crée sans compte et sans abonnement xAI.</p>
+      </header>
+      <div class="layout">
+        <section class="group">
+          <label>Prompt<textarea id="prompt" maxlength="800">un renard roux dans une forêt enneigée, lumière dorée</textarea></label>
+          <div class="group"><span>Style</span><div class="chips" id="styles"></div></div>
+          <div class="group"><span>Format</span><div class="chips" id="ratios"></div></div>
+          <label>À éviter<input id="negative" maxlength="200" placeholder="texte, flou, filigrane" /></label>
+          <button class="go" id="go" type="button">Générer</button>
+          <p class="err" id="error" hidden></p>
+          <p class="note">Service public gratuit. La définition monte jusqu’à 1280 px, pas en 4K. Pas de vidéo sur cette version.</p>
+        </section>
+        <section class="group">
+          <div class="frame" id="frame"><p class="note">L’image apparaîtra ici.</p></div>
+          <a class="link" id="download" hidden href="" target="_blank" rel="noreferrer">Télécharger</a>
+          <div class="thumbs" id="thumbs"></div>
+        </section>
+      </div>
+    </main>
+    <script>
+      const styles = [["Réaliste", "photorealistic, natural light, sharp detail"],["Illustration", "illustration, clean shapes, rich color"],["3D", "3D render, studio lighting"],["Anime", "anime, clean lineart"],["Aquarelle", "watercolor, soft paper texture"]];
+      const ratios = {"1:1":[1024,1024],"16:9":[1280,720],"9:16":[720,1280],"4:3":[1024,768],"3:4":[768,1024]};
+      let style = styles[0][1];
+      let ratio = "1:1";
+      const shots = [];
+      function chips(host, items, current, onPick) {
+        host.innerHTML = "";
+        items.forEach((item) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = item.label;
+          button.setAttribute("aria-pressed", String(item.value === current()));
+          button.addEventListener("click", () => { onPick(item.value); chips(host, items, current, onPick); });
+          host.appendChild(button);
+        });
+      }
+      chips(document.querySelector("#styles"), styles.map(([label, value]) => ({ label, value })), () => style, (value) => { style = value; });
+      chips(document.querySelector("#ratios"), Object.keys(ratios).map((label) => ({ label, value: label })), () => ratio, (value) => { ratio = value; });
+      const frame = document.querySelector("#frame");
+      const error = document.querySelector("#error");
+      const download = document.querySelector("#download");
+      const thumbs = document.querySelector("#thumbs");
+      const go = document.querySelector("#go");
+      function show(url, prompt) {
+        frame.replaceChildren();
+        const img = document.createElement("img");
+        img.alt = prompt;
+        img.src = url;
+        frame.appendChild(img);
+        download.hidden = false;
+        download.href = url;
+      }
+      go.addEventListener("click", () => {
+        const text = document.querySelector("#prompt").value.trim();
+        if (text.length < 2) return;
+        error.hidden = true;
+        go.disabled = true;
+        go.textContent = "Génération…";
+        frame.replaceChildren(Object.assign(document.createElement("p"), { className: "note", textContent: "Génération en cours…" }));
+        const avoid = document.querySelector("#negative").value.trim();
+        const full = [text, style, avoid ? "without " + avoid : ""].filter(Boolean).join(", ");
+        const [width, height] = ratios[ratio];
+        const seed = Math.floor(Math.random() * 1e9);
+        const url = "https://image.pollinations.ai/prompt/" + encodeURIComponent(full) + "?width=" + width + "&height=" + height + "&nologo=true&model=flux&seed=" + seed;
+        const img = new Image();
+        img.onload = () => {
+          shots.unshift({ url, prompt: text });
+          if (shots.length > 8) shots.pop();
+          show(url, text);
+          thumbs.replaceChildren();
+          shots.forEach((shot) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            const thumb = document.createElement("img");
+            thumb.src = shot.url;
+            thumb.alt = "";
+            button.appendChild(thumb);
+            button.addEventListener("click", () => show(shot.url, shot.prompt));
+            thumbs.appendChild(button);
+          });
+          go.disabled = false;
+          go.textContent = "Générer";
+        };
+        img.onerror = () => {
+          error.hidden = false;
+          error.textContent = "L’image n’a pas pu être créée. Réessaie.";
+          go.disabled = false;
+          go.textContent = "Générer";
+        };
+        img.src = url;
+      });
+    </script>
+  </body>
+</html>
