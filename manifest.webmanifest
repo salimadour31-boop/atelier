@@ -1,0 +1,14 @@
+{
+  "name": "Atelier",
+  "short_name": "Atelier",
+  "description": "Génération d'images, sans compte et sans quota.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14120f",
+  "theme_color": "#14120f",
+  "lang": "fr",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
